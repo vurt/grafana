@@ -2221,7 +2221,7 @@
         }
     }
 
-    function format (inputString) {
+    function moment_format__format (inputString) {
         var output = formatMoment(this, inputString || utils_hooks__hooks.defaultFormat);
         return this.localeData().postformat(output);
     }
@@ -2999,7 +2999,7 @@
     momentPrototype__proto.clone             = clone;
     momentPrototype__proto.diff              = diff;
     momentPrototype__proto.endOf             = endOf;
-    momentPrototype__proto.format            = format;
+    momentPrototype__proto.format            = moment_format__format;
     momentPrototype__proto.from              = from;
     momentPrototype__proto.fromNow           = fromNow;
     momentPrototype__proto.to                = to;
@@ -3097,11 +3097,11 @@
 
     var momentPrototype = momentPrototype__proto;
 
-    function moment__createUnix (input) {
+    function moment_moment__createUnix (input) {
         return local__createLocal(input * 1000);
     }
 
-    function moment__createInZone () {
+    function moment_moment__createInZone () {
         return local__createLocal.apply(null, arguments).parseZone();
     }
 
@@ -3472,7 +3472,7 @@
     var minutes      = makeGetter('minutes');
     var hours        = makeGetter('hours');
     var days         = makeGetter('days');
-    var months       = makeGetter('months');
+    var duration_get__months       = makeGetter('months');
     var years        = makeGetter('years');
 
     function weeks () {
@@ -3617,7 +3617,7 @@
     duration_prototype__proto.hours          = hours;
     duration_prototype__proto.days           = days;
     duration_prototype__proto.weeks          = weeks;
-    duration_prototype__proto.months         = months;
+    duration_prototype__proto.months         = duration_get__months;
     duration_prototype__proto.years          = years;
     duration_prototype__proto.humanize       = humanize;
     duration_prototype__proto.toISOString    = iso_string__toISOString;
@@ -3660,7 +3660,7 @@
     utils_hooks__hooks.max                   = max;
     utils_hooks__hooks.now                   = now;
     utils_hooks__hooks.utc                   = create_utc__createUTC;
-    utils_hooks__hooks.unix                  = moment__createUnix;
+    utils_hooks__hooks.unix                  = moment_moment__createUnix;
     utils_hooks__hooks.months                = lists__listMonths;
     utils_hooks__hooks.isDate                = isDate;
     utils_hooks__hooks.locale                = locale_locales__getSetGlobalLocale;
@@ -3668,7 +3668,7 @@
     utils_hooks__hooks.duration              = create__createDuration;
     utils_hooks__hooks.isMoment              = isMoment;
     utils_hooks__hooks.weekdays              = lists__listWeekdays;
-    utils_hooks__hooks.parseZone             = moment__createInZone;
+    utils_hooks__hooks.parseZone             = moment_moment__createInZone;
     utils_hooks__hooks.localeData            = locale_locales__getLocale;
     utils_hooks__hooks.isDuration            = isDuration;
     utils_hooks__hooks.monthsShort           = lists__listMonthsShort;
@@ -3681,8 +3681,127 @@
     utils_hooks__hooks.relativeTimeThreshold = duration_humanize__getSetRelativeTimeThreshold;
     utils_hooks__hooks.prototype             = momentPrototype;
 
-    var _moment = utils_hooks__hooks;
+    var moment__default = utils_hooks__hooks;
 
-    return _moment;
+    //! moment.js locale configuration
+    //! locale : chinese (zh-cn)
+    //! author : suupic : https://github.com/suupic
+    //! author : Zeno Zeng : https://github.com/zenozeng
+
+    var zh_cn = moment__default.defineLocale('zh-cn', {
+        months : '一月_二月_三月_四月_五月_六月_七月_八月_九月_十月_十一月_十二月'.split('_'),
+        monthsShort : '1月_2月_3月_4月_5月_6月_7月_8月_9月_10月_11月_12月'.split('_'),
+        weekdays : '星期日_星期一_星期二_星期三_星期四_星期五_星期六'.split('_'),
+        weekdaysShort : '周日_周一_周二_周三_周四_周五_周六'.split('_'),
+        weekdaysMin : '日_一_二_三_四_五_六'.split('_'),
+        longDateFormat : {
+            LT : 'Ah点mm分',
+            LTS : 'Ah点m分s秒',
+            L : 'YYYY-MM-DD',
+            LL : 'YYYY年MMMD日',
+            LLL : 'YYYY年MMMD日Ah点mm分',
+            LLLL : 'YYYY年MMMD日ddddAh点mm分',
+            l : 'YYYY-MM-DD',
+            ll : 'YYYY年MMMD日',
+            lll : 'YYYY年MMMD日Ah点mm分',
+            llll : 'YYYY年MMMD日ddddAh点mm分'
+        },
+        meridiemParse: /凌晨|早上|上午|中午|下午|晚上/,
+        meridiemHour: function (hour, meridiem) {
+            if (hour === 12) {
+                hour = 0;
+            }
+            if (meridiem === '凌晨' || meridiem === '早上' ||
+                    meridiem === '上午') {
+                return hour;
+            } else if (meridiem === '下午' || meridiem === '晚上') {
+                return hour + 12;
+            } else {
+                // '中午'
+                return hour >= 11 ? hour : hour + 12;
+            }
+        },
+        meridiem : function (hour, minute, isLower) {
+            var hm = hour * 100 + minute;
+            if (hm < 600) {
+                return '凌晨';
+            } else if (hm < 900) {
+                return '早上';
+            } else if (hm < 1130) {
+                return '上午';
+            } else if (hm < 1230) {
+                return '中午';
+            } else if (hm < 1800) {
+                return '下午';
+            } else {
+                return '晚上';
+            }
+        },
+        calendar : {
+            sameDay : function () {
+                return this.minutes() === 0 ? '[今天]Ah[点整]' : '[今天]LT';
+            },
+            nextDay : function () {
+                return this.minutes() === 0 ? '[明天]Ah[点整]' : '[明天]LT';
+            },
+            lastDay : function () {
+                return this.minutes() === 0 ? '[昨天]Ah[点整]' : '[昨天]LT';
+            },
+            nextWeek : function () {
+                var startOfWeek, prefix;
+                startOfWeek = moment__default().startOf('week');
+                prefix = this.unix() - startOfWeek.unix() >= 7 * 24 * 3600 ? '[下]' : '[本]';
+                return this.minutes() === 0 ? prefix + 'dddAh点整' : prefix + 'dddAh点mm';
+            },
+            lastWeek : function () {
+                var startOfWeek, prefix;
+                startOfWeek = moment__default().startOf('week');
+                prefix = this.unix() < startOfWeek.unix()  ? '[上]' : '[本]';
+                return this.minutes() === 0 ? prefix + 'dddAh点整' : prefix + 'dddAh点mm';
+            },
+            sameElse : 'LL'
+        },
+        ordinalParse: /\d{1,2}(日|月|周)/,
+        ordinal : function (number, period) {
+            switch (period) {
+            case 'd':
+            case 'D':
+            case 'DDD':
+                return number + '日';
+            case 'M':
+                return number + '月';
+            case 'w':
+            case 'W':
+                return number + '周';
+            default:
+                return number;
+            }
+        },
+        relativeTime : {
+            future : '%s内',
+            past : '%s前',
+            s : '几秒',
+            m : '1 分钟',
+            mm : '%d 分钟',
+            h : '1 小时',
+            hh : '%d 小时',
+            d : '1 天',
+            dd : '%d 天',
+            M : '1 个月',
+            MM : '%d 个月',
+            y : '1 年',
+            yy : '%d 年'
+        },
+        week : {
+            // GB/T 7408-1994《数据元和交换格式·信息交换·日期和时间表示法》与ISO 8601:1988等效
+            dow : 1, // Monday is the first day of the week.
+            doy : 4  // The week that contains Jan 4th is the first week of the year.
+        }
+    });
+
+    var moment_with_locales = moment__default;
+    moment_with_locales.locale('zh_cn');
+
+    return moment_with_locales;
 
 }));
